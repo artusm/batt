@@ -1,0 +1,60 @@
+{
+  "dataSources": [
+    {
+      "id": "elasticsearch-server",
+      "type": "elasticsearch",
+      "index": "{{.ESIndex}}",
+      "urlPrefix": "{{if .ESProxy}}/es{{else}}{{.ESURL}}{{end}}",
+      "fields": "main"
+    }
+  ],
+  "fields": {
+    "main": {
+      "timestamp": "{{.TimestampField}}",
+      {{if .DisableTimestampNano}}"disableTimestampNano": "{{.DisableTimestampNano}}" {{end}},
+"collapsedFormatting": [
+        {
+          "field": "{{.TimestampField}}",
+          "transforms": [
+            "timestamp"
+          ]
+        },
+        {
+          "field": "{{.LevelField}}",
+          "transforms": [
+            "upperCase",
+            {
+              "mapValue": {
+                "DEBUG": "DEBU",
+                "WARNING": "WARN",
+                "ERROR": "ERRO"
+              }
+            },
+            {
+              "mapClass": {
+                "DEBU": "has-text-success",
+                "INFO": "has-text-info",
+                "WARN": "has-text-warning",
+                "ERRO": "has-text-danger"
+              }
+            },
+            {
+              "addClass": "has-text-weight-bold"
+            }
+          ]
+        },
+        {
+          "field": "{{.MessageField}}",
+          "transforms": [
+            {
+              "addClass": "strong"
+            }
+          ]
+        }
+      ],
+      "collapsedIgnore": [
+        {{.IgnoredFieldsJoined}}
+      ]
+    }
+  }
+}
